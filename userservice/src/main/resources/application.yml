@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: userservice
+  cloud:
+    discovery:
+      enabled: true
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      connection-test-query: SELECT 1
+  jpa:
+    database: POSTGRESQL
+    open-in-view: false
+    #database-platform: org.hibernate.dialect.PosgreSQLInnoDBDialect
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: ${POSTGRES_DATABASE}
+        #dialect: org.hibernate.dialect.PosgreSQLInnoDBDialect
+        format_sql: true
+  kafka:
+    bootstrap-servers:
+      - ${KAFKA_SERVER_URL}
+    template:
+      default-topic: NOTIFICATION_TOPIC
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping: Notification:io.getarrays.userservice.domain.Notification
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://${USER_NAME}:${PASSWORD}@localhost:5002/eureka/
+
+server:
+  port: ${SERVER_PORT}
+
+ui:
+  app:
+    url: ${UI_APP_URL}
+
+jwks:
+  uri: ${JWKS_URI}
+
+keys:
+  private: ${PRIVATE_KEY}
+  public: ${PUBLIC_KEY}

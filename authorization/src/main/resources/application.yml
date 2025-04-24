@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: authorizationserver
+  cloud:
+    discovery:
+      enabled: true
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      connection-test-query: SELECT 1 # Simple query to validate DB connections (HikariCP)
+  jpa:
+    database: POSTGRESQL
+    open-in-view: false # Disables keeping the EntityManager open for the view (good practice for APIs)
+    #database-platform: org.hibernate.dialect.PosgreSQLInnoDBDialect
+    generate-ddl: false  # Don’t auto-generate schema (assumes you manage DB manually or with Flyway/Liquibase)
+    show-sql: true  # Enable SQL query logging (helpful for debugging)
+    hibernate:
+      ddl-auto: update # Hibernate auto-updates DB schema (in dev environments)
+    properties:
+      hibernate:
+        default_schema: ${POSTGRES_DATABASE}
+        #dialect: org.hibernate.dialect.PosgreSQLInnoDBDialect
+        format_sql: true # Pretty-print SQL in logs (for readability)
+
+eureka:
+  instance:
+    prefer-ip-address: true # Register this service with IP instead of hostname
+  client:
+    service-url:
+      defaultZone: http://${USER_NAME}:${PASSWORD}@localhost:5002/eureka/
+
+#server:
+#  servlet:
+#    context-path: /authorization
+
+ui:
+  app:
+    url: ${UI_APP_URL} # URL of your frontend Angular app (used for CORS, redirects, etc.)
+
+keys:
+  private: ${PRIVATE_KEY} # Path or value of the private key used for JWT signing
+  public: ${PUBLIC_KEY}  # Path or value of the public key used for JWT verification
