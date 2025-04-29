@@ -1,0 +1,85 @@
+spring:
+  application:
+    name: notificationservice
+  cloud:
+    discovery:
+      enabled: true
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      connection-test-query: SELECT 1
+  jpa:
+    database: POSTGRESQL
+    open-in-view: false
+    #database-platform: org.hibernate.dialect.PosgreSQLInnoDBDialect
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: ${POSTGRES_DATABASE}
+        #dialect: org.hibernate.dialect.PosgreSQLInnoDBDialect
+        format_sql: true
+  kafka:
+    bootstrap-servers:
+      - ${KAFKA_SERVER_URL}  # The Kafka broker address (e.g., "localhost:9092"), loaded from environment variables
+    template:
+      default-topic: NOTIFICATION_TOPIC # Default topic used when sending messages with KafkaTemplate
+    consumer:
+      group-id: topicgroupid # Consumer group ID for Kafka (used to group consumers logically)
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # Deserializes the message key as a plain string
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer # Deserializes the message value as JSON
+      properties:
+        spring:
+          json:
+            type:
+              mapping: Notification:com.sahar.notificationservice.domain.Notification
+              # Maps the "Notification" type in Kafka messages to the Notification Java class
+              # This helps the deserializer know which class to convert the JSON into
+
+  thymeleaf:
+    suffix: .html
+    enabled: true # Enables Thymeleaf as the view engine (used for rendering email templates, etc.)
+
+  mail:
+    host: ${EMAIL_HOST}
+    port: ${EMAIL_PORT}
+    username: ${EMAIL_ID}
+    password: ${EMAIL_PASSWORD}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        mime:
+          charset: UTF
+        smtp:
+          writetimeout: 10000 # Timeout for writing to the SMTP server (in milliseconds)
+          connectiontimeout: 10000 # Timeout for connecting to the SMTP server (in ms)
+          timeout: 10000  # Overall SMTP operation timeout (in ms)
+          auth: true # Enables SMTP authentication
+          starttls:
+            enable: true # Enables STARTTLS (secure connection upgrade)
+            required: true # Requires STARTTLS for the connection
+    verify:
+      host: ${VERIFY_EMAIL_HOST}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://${USER_NAME}:${PASSWORD}@localhost:5002/eureka/
+
+server:
+  port: ${SERVER_PORT}
+
+ui:
+  app:
+    url: ${UI_APP_URL}
+
+jwks:
+  uri: ${JWKS_URI}
