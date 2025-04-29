@@ -9,8 +9,8 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
-@Builder
+@ToString //This automatically generates a toString() method
+@Builder //This creates a Builder pattern for the class
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {

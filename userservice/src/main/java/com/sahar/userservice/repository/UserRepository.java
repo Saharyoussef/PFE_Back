@@ -28,7 +28,6 @@ public interface UserRepository {
     void resetPassword(String email);
     void doResetPassword(String userUuid, String token, String password, String confirmPassword);
     List<User> getUsers();
-    User getAssignee(String ticketUuid);
     Credential getCredential(String userUuid);
     List<Device> getDevices(String userUuid);
     void deleteAccountToken(String token);

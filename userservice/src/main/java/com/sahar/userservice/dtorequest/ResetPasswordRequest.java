@@ -12,6 +12,8 @@ import lombok.Setter;
 public class ResetPasswordRequest {
     @NotEmpty(message = "User ID cannot be empty or null")
     private String userUuid;
+
+    // This field holds the reset token (usually sent to user's email).
     @NotEmpty(message = "Token cannot be empty or null")
     private String token;
     @NotEmpty(message = "Password cannot be empty or null")

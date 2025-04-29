@@ -354,20 +354,6 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getAssignee(String ticketUuid) {
-        try {
-            return jdbc.sql(UserQuery.SELECT_TICKET_ASSIGNEE_QUERY).param("ticketUuid", ticketUuid).query(User.class).single();
-        } catch (EmptyResultDataAccessException exception) {
-            log.error(exception.getMessage());
-            log.error("Ticket is not assigned.");
-            return User.builder().build();
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
-            throw new ApiException("An error occurred. Please try again.");
-        }
-    }
-
-    @Override
     public Credential getCredential(String userUuid) {
         try {
             return jdbc.sql(UserQuery.SELECT_USER_CREDENTIAL_QUERY).param("userUuid", userUuid).query(Credential.class).single();

@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import static com.sahar.userservice.utils.RequestUtils.handleErrorResponse;
 
+//This is triggered when a logged-in user tries to access a resource they don’t have permission for.
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 

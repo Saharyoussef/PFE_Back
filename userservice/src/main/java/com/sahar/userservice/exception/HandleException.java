@@ -34,10 +34,13 @@ import static com.sahar.userservice.utils.RequestUtils.handleErrorResponse;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.springframework.http.HttpStatus.*;
 
-
+// This annotation allows centralized exception handling across all @RestController classes.
 @RestControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
+
+// This class handles various exceptions and customizes the response sent back to the client.
+// It extends Spring's default exception handler to override specific behavior.
 public class HandleException extends ResponseEntityExceptionHandler implements ErrorController {
     private final HttpServletRequest request;
 

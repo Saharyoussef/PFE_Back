@@ -181,11 +181,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getAssignee(String ticketUuid) {
-        return userRepository.getAssignee(ticketUuid);
-    }
-
-    @Override
     public Credential getCredential(String userUuid) {
         return userRepository.getCredential(userUuid);
     }

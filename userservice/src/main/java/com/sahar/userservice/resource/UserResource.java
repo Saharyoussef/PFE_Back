@@ -39,8 +39,9 @@ import static org.springframework.http.ResponseEntity.ok;
 @AllArgsConstructor
 @RequestMapping("/user")
 public class UserResource {
-    private final UserService userService;
+    private final UserService userService; // Service layer dependency to handle business logic
 
+    // ------------------------ ACCOUNT MANAGEMENT ------------------------
     @PostMapping("/register")
     public ResponseEntity<Response> register(@RequestBody UserRequest user, HttpServletRequest request) {
         userService.createUser(user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword());
@@ -49,10 +50,12 @@ public class UserResource {
 
     @GetMapping("/verify/account")
     public ResponseEntity<Response> verifyAccount(@RequestParam("token") String token, HttpServletRequest request) {
+        // Verify the user's account by token
         userService.verifyAccount(token);
         return ok(getResponse(request, emptyMap(), "Account verified. You may login now", OK));
     }
 
+    // ------------------------ TWO-FACTOR AUTHENTICATION (2FA) ------------------------
     @PatchMapping("/mfa/enable")
     public ResponseEntity<Response> enableMfa(@NotNull Authentication authentication, HttpServletRequest request) {
         var user = userService.enableMfa(authentication.getName());
@@ -65,6 +68,7 @@ public class UserResource {
         return ok(getResponse(request, of("user", user), "2FA disabled successfully", OK));
     }
 
+    // ------------------------ PROFILE MANAGEMENT ------------------------
     @GetMapping("/profile")
     public ResponseEntity<Response> profile(@NotNull Authentication authentication, HttpServletRequest request) {
         var user = userService.getUserByUuid(authentication.getName());
@@ -75,12 +79,6 @@ public class UserResource {
     @GetMapping("/{userUuid}")
     public ResponseEntity<Response> getUserByUuid(@NotNull Authentication authentication, @PathVariable("userUuid") String userUuid, HttpServletRequest request) {
         var user = userService.getUserByUuid(userUuid);
-        return ok(getResponse(request, of("user", user), "Profile retrieved", OK));
-    }
-
-    @GetMapping("/assignee/{ticketUuid}")
-    public ResponseEntity<Response> getAssigneeByUuid(@NotNull Authentication authentication, @PathVariable("ticketUuid") String ticketUuid, HttpServletRequest request) {
-        var user = userService.getAssignee(ticketUuid);
         return ok(getResponse(request, of("user", user), "Profile retrieved", OK));
     }
 
@@ -96,6 +94,7 @@ public class UserResource {
         return ok(getResponse(request, of("credential", credential), "Profile retrieved", OK));
     }
 
+    // ------------------------ PROFILE UPDATES ------------------------
     @PatchMapping("/update")
     public ResponseEntity<Response> updateUser(@NotNull Authentication authentication, @RequestBody UserRequest user, HttpServletRequest request) {
         var updatedUser = userService.updateUser(authentication.getName(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getBio(), user.getAddress());
@@ -126,6 +125,7 @@ public class UserResource {
         return ok(getResponse(request, of("user", user), "User updated successfully", OK));
     }
 
+    // ------------------------ PASSWORD MANAGEMENT ------------------------
     //When user IS logged in
     @PatchMapping("/updatepassword")
     public ResponseEntity<Response> updatePassword(@NotNull Authentication authentication, @RequestBody PasswordRequest passwordRequest, HttpServletRequest request) {
@@ -154,6 +154,7 @@ public class UserResource {
         return ok(getResponse(request, emptyMap(), "Password reset successfully. You may log in now", OK));
     }
 
+    // ------------------------ USER LIST + PHOTO MANAGEMENT ------------------------
     @GetMapping("/list")
     public ResponseEntity<Response> getUsers(@NotNull Authentication authentication, HttpServletRequest request) {
         return ok(getResponse(request, of("users", userService.getUsers()), "Users retrieved", OK));
@@ -171,6 +172,7 @@ public class UserResource {
     }
 
 
+    // Returns a fake URI for created resources (example: after registration)
     private URI getUri() {
         return URI.create("/user/profile/userId");
     }

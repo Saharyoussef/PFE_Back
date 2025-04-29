@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import static com.sahar.userservice.utils.RequestUtils.handleErrorResponse;
 
-
+//This is triggered when an unauthenticated user tries to access a secured resource (i.e., no valid JWT token or session).
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
