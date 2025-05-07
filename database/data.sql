@@ -1,0 +1,10 @@
+-- Populate roles table
+INSERT INTO roles (role_uuid, name, authority) VALUES ('7d1b82b1-92c7-4fae-b790-73eb1ac9d6b5', 'USER', 'user:read,user:update');
+INSERT INTO roles (role_uuid, name, authority) VALUES ('1a0e13de-4fdf-4db0-8a3d-08fce64cbe8c', 'TECH_SUPPORT', 'user:read,user:update,dashboard:create,dashboard:read,dashboard:update,dashboard:delete,screenshot:trigger,screenshot:delete,screenshot:read');
+INSERT INTO roles (role_uuid, name, authority) VALUES ('894853e1-9238-4c64-b5d8-c0a29bdf1b94', 'MANAGER', 'user:create,user:read,user:update,dashboard:create,dashboard:read,dashboard:update,dashboard:delete,screenshot:trigger,screenshot:delete,screenshot:read');
+INSERT INTO roles (role_uuid, name, authority) VALUES ('7f907494-90b0-4165-b2fd-00e04fb18b49', 'ADMIN', 'user:create,user:read,user:update,user:delete,dashboard:create,dashboard:read,dashboard:update,dashboard:delete,screenshot:trigger,screenshot:delete,screenshot:read');
+INSERT INTO roles (role_uuid, name, authority) VALUES ('838ca5ee-eb15-427a-b380-6cf7bfbd68b7', 'SUPER_ADMIN', 'app:create,app:read,app:update,app:delete,user:create,user:read,user:update,user:delete,dashboard:create,dashboard:read,dashboard:update,dashboard:delete,screenshot:trigger,screenshot:delete,screenshot:read');
+
+-- Populate services table
+INSERT INTO grafanadashboard (grafanadashboard_uuid, name, description, url) VALUES ('0l0e13de-4fdf-9db0-8a3d-08fce64cbp5b', 'Test Service', 'Handles test data', 'http://localhost:3000/d/fedcbxxyqxse8a/service1?orgId=1&from=now-30m&to=now&timezone=browser');
+INSERT INTO grafanadashboard (grafanadashboard_uuid, name, description, url) VALUES ('058e13de-8udf-1pb0-8a3d-08fkl64cbp9m', 'Node exporter Service', 'Node exporter data', 'http://localhost:3000/d/rYdddlPWk1/node-exporter-full?orgId=1&from=now-24h&to=now&timezone=browser&var-datasource=default&var-job=node&var-node=node-exporter:9100&var-diskdevices=%5Ba-z%5D%2B%7Cnvme%5B0-9%5D%2Bn%5B0-9%5D%2B%7Cmmcblk%5B0-9%5D%2B&refresh=1m');
