@@ -25,6 +25,10 @@ spring:
             uri: lb://NOTIFICATIONSERVICE
             predicates:
               - Path=/notification/**
+          - id: dashboard-service
+            uri: lb://DASHBOARDSERVICE
+            predicates:
+              - Path=/dashboard/**
 #            filters:
 #              -name: RequestRateLimiter
 #              args:
