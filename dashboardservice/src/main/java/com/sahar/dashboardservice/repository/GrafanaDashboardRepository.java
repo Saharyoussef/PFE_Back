@@ -3,6 +3,7 @@ package com.sahar.dashboardservice.repository;
 import com.sahar.dashboardservice.model.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GrafanaDashboardRepository {
     GrafanaDashboard createGrafanaDashboard(String name, String description, String url);
@@ -11,4 +12,6 @@ public interface GrafanaDashboardRepository {
     GrafanaDashboard getGrafanaDashboard(String grafanadashboardUuid);
     List<GrafanaDashboard> getGrafanaDashboards(int page, int size, String filter);
     int getPages(String userUuid, int page, int size, String filter);
+    Optional<GrafanaDashboard>  findByUuid(String grafanadashboardUuid);
+    List<String> findAllDashboardUuids();
 }

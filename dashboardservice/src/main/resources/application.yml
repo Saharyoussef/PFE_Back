@@ -42,3 +42,7 @@ ui:
 
 jwks:
   uri: ${JWKS_URI}
+
+python-api:
+  screenshot-service:
+    base-url: http://localhost:8000

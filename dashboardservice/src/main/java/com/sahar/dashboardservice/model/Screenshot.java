@@ -19,5 +19,5 @@ public class Screenshot {
     private Long grafanaDashboardId;
     private String url;
     private String createdAt;
-    private String updatedAt;
+    private String grafanaDashboardName; // To hold the joined dashboard name
 }

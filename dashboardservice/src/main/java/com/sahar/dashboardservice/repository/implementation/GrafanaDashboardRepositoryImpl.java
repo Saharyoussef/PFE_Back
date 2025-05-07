@@ -2,6 +2,7 @@ package com.sahar.dashboardservice.repository.implementation;
 
 import com.sahar.dashboardservice.model.GrafanaDashboard;
 import com.sahar.dashboardservice.repository.GrafanaDashboardRepository;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static com.sahar.dashboardservice.query.GrafanaDashboardQuery.*;
@@ -136,6 +138,37 @@ public class GrafanaDashboardRepositoryImpl implements GrafanaDashboardRepositor
         } catch (Exception exception) {
             log.error(exception.getMessage());
             throw new ApiException("An error occurred. Please try again.");
+        }
+    }
+
+    @Override
+    public Optional<GrafanaDashboard> findByUuid(String grafanadashboardUuid) {
+        log.debug("Finding full dashboard for UUID: {}", grafanadashboardUuid);
+        try {
+            // Use BeanPropertyRowMapper if column names match GrafanaDashboard fields
+            // Otherwise, you'd need a RowMapper<GrafanaDashboard>
+            return jdbc.sql(SELECT_DASHBOARD_BY_UUID) // Use the query that selects all columns
+                    .param("grafanadashboardUuid", grafanadashboardUuid)
+                    .query(BeanPropertyRowMapper.newInstance(GrafanaDashboard.class)) // Use built-in mapper
+                    .optional();
+        } catch (EmptyResultDataAccessException ex) {
+            return Optional.empty();
+        } catch (Exception exception) {
+            log.error("Error finding dashboard by UUID {}: {}", grafanadashboardUuid, exception.getMessage(), exception);
+            throw new RuntimeException("Database error finding dashboard", exception);
+        }
+    }
+
+    @Override
+    public List<String> findAllDashboardUuids() {
+        log.debug("Finding all dashboard UUIDs");
+        try {
+            return jdbc.sql(SELECT_ALL_DASHBOARD_UUIDS)
+                    .query(String.class) // Maps the single column to String
+                    .list();
+        } catch (Exception e) {
+            log.error("Error fetching all dashboard UUIDs", e);
+            throw new RuntimeException("Failed to fetch dashboard UUIDs", e);
         }
     }
 

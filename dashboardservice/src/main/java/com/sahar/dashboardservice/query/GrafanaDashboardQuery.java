@@ -40,4 +40,16 @@ public class GrafanaDashboardQuery {
             FROM grafanadashboard g 
             WHERE 1 = 1
             """;
+
+    public static final String SELECT_DASHBOARD_BY_UUID =
+            """
+            SELECT * FROM grafanadashboard WHERE grafanadashboard_uuid = :grafanadashboardUuid
+            """;
+
+    public static final String SELECT_ALL_DASHBOARD_UUIDS =
+            """
+            SELECT grafanadashboard_uuid
+            FROM grafanadashboard
+            ORDER BY created_at DESC
+            """;
 }
