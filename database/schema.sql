@@ -148,6 +148,17 @@ CREATE TABLE IF NOT EXISTS screenshot (
     CONSTRAINT fk_screenshots_grafanadashboard_id FOREIGN KEY (grafanadashboard_id) REFERENCES grafanadashboard (grafanadashboard_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
+CREATE TABLE IF NOT EXISTS screenshotdata (
+    screenshotdata_id BIGSERIAL PRIMARY KEY,
+    screenshotdata_uuid VARCHAR(40) NOT NULL,
+    screenshot_id BIGINT NOT NULL,
+    metrics_data JSONB,
+    anomaly_data JSONB,
+    created_at TIMESTAMP(6) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP(6) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_screenshotsdata_screenshotdata_uuid UNIQUE (screenshotdata_uuid),
+    CONSTRAINT fk_screenshotsdata_screenshot_id FOREIGN KEY (screenshot_id) REFERENCES screenshot (screenshot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+);
 -- Stored Procedures
 
 CREATE OR REPLACE PROCEDURE create_user (IN p_user_uuid VARCHAR(40), IN p_first_name VARCHAR(25), IN p_last_name VARCHAR(25), IN p_email VARCHAR(40), IN p_username VARCHAR(25), IN p_password VARCHAR(255), IN p_credential_uuid VARCHAR(40), IN p_token VARCHAR(40), IN p_member_id VARCHAR(40))
