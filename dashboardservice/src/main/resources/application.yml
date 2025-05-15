@@ -45,4 +45,8 @@ jwks:
 
 python-api:
   screenshot-service:
-    base-url: http://localhost:8000
+    base-url: http://localhost:8300
+  metrics-service:
+    base-url: http://localhost:8400
+  anomaly-service:
+    base-url: http://localhost:8500

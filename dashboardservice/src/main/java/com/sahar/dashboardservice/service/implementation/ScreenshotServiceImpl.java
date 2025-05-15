@@ -6,6 +6,7 @@ import com.sahar.dashboardservice.model.GrafanaDashboard;
 import com.sahar.dashboardservice.model.Screenshot;
 import com.sahar.dashboardservice.repository.GrafanaDashboardRepository;
 import com.sahar.dashboardservice.repository.ScreenshotRepository;
+import com.sahar.dashboardservice.service.ScreenshotDataService;
 import com.sahar.dashboardservice.service.ScreenshotService;
 import com.sahar.dashboardservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class ScreenshotServiceImpl implements ScreenshotService {
     private final GrafanaDashboardRepository grafanaDashboardRepository;
     private final WebClient screenshotWebClient; // Ensure this bean is configured and injected
     private final UserService userService;
+    private final ScreenshotDataService screenshotDataService; // Inject ScreenshotDataService
 
     @Override
     public Screenshot takeAndSaveScreenshot(String userUuid, String grafanadashboardUuid) {
@@ -83,6 +86,49 @@ public class ScreenshotServiceImpl implements ScreenshotService {
                 filePath
         );
         log.info("[User: {}] Saved screenshot record with UUID: {}", userUuid, savedScreenshot.getScreenshotUuid());
+
+        // --- 4. Asynchronous Metrics Extraction and Anomaly Detection Chain ---
+        // This part runs in the background. The takeAndSaveScreenshot method returns 'savedScreenshot' immediately.
+        screenshotDataService.fetchAndSaveMetrics(savedScreenshot.getScreenshotId(), dashboard.getUrl())
+                .thenComposeAsync(extractedMetricsList -> {
+                    // This block executes after fetchAndSaveMetrics completes (successfully or with an empty list if error handled inside)
+                    if (extractedMetricsList == null || extractedMetricsList.isEmpty()) {
+                        log.warn("[ScreenshotID: {}] No metrics were extracted or an error occurred during extraction. Skipping anomaly detection.",
+                                savedScreenshot.getScreenshotId());
+                        return CompletableFuture.completedFuture(null);
+                    }
+                    log.info("[ScreenshotID: {}] Metrics successfully extracted ({} panels). Proceeding to anomaly detection.",
+                            savedScreenshot.getScreenshotId(), extractedMetricsList.size());
+                    return screenshotDataService.detectAndSaveAnomalies(savedScreenshot.getScreenshotId(), extractedMetricsList);
+                })
+                .whenComplete((anomalyResponse, ex) -> {
+                    // 'ex' will be non-null if any unhandled exception occurred in the chain.
+
+                    if (ex != null) {
+                        log.error("[ScreenshotID: {}] Asynchronous metrics/anomaly processing failed: {}",
+                                savedScreenshot.getScreenshotId(), ex.getMessage(), ex);
+                        // At this point, metrics might be saved (or an empty record), but anomaly data wouldn't be.
+                        // The user interface would eventually show that the anomaly detection part failed or is missing.
+                    } else if (anomalyResponse != null) {
+                        // Anomaly detection was attempted (or returned a default if no metrics for it inside detectAndSaveAnomalies)
+                        boolean wasSkippedDueToNoMetrics = anomalyResponse.getExplanations() != null &&
+                                anomalyResponse.getExplanations().contains("Anomaly detection skipped: No input metrics data.");
+
+                        if (wasSkippedDueToNoMetrics) {
+                            log.info("[ScreenshotID: {}] Anomaly detection was skipped by the service due to no input metrics.", savedScreenshot.getScreenshotId());
+                            // No anomaly record was saved by the service in this specific "skipped" case.
+                        } else {
+                            log.info("[ScreenshotID: {}] Anomaly detection process completed. Is anomaly: {}. Score: {}",
+                                    savedScreenshot.getScreenshotId(), anomalyResponse.isAnomaly(), anomalyResponse.getAnomalyScore());
+                        }
+                    } else {
+                        log.info("[ScreenshotID: {}] Asynchronous processing chain completed; anomaly detection was skipped due to no metrics from the extraction phase.",
+                                savedScreenshot.getScreenshotId());
+                    }
+                });
+
+        // Return the initially saved screenshot object to the caller quickly.
+        // The UI can indicate that metrics and anomaly analysis are "in progress".
 
         return savedScreenshot;
     }
