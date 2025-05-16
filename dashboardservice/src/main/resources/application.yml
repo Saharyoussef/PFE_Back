@@ -25,6 +25,26 @@ spring:
         default_schema: ${POSTGRES_DATABASE}
         #dialect: org.hibernate.dialect.PosgreSQLInnoDBDialect
         format_sql: true
+  kafka:
+    bootstrap-servers:
+      - ${KAFKA_SERVER_URL}
+    template:
+      default-topic: NOTIFICATION_TOPIC
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping: Notification:com.sahar.dashboardservice.domain.Notification
+
+app:
+  notifications:
+    predefined-emails:
+      admin_team: "admin@votredomaine.com"
+      support_team: "support@votredomaine.com"
+      management_group: "managers@votredomaine.com"
 
 eureka:
   instance:
