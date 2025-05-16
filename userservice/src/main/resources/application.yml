@@ -37,7 +37,8 @@ spring:
         spring:
           json:
             type:
-              mapping: Notification:io.getarrays.userservice.domain.Notification
+              mapping: Notification:com.sahar.userservice.domain.Notification
+
 
 eureka:
   instance:
