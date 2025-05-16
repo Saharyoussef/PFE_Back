@@ -7,6 +7,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -28,6 +29,7 @@ public class EmailServiceImpl implements EmailService {
     public static final String ACCOUNT_VERIFICATION_TEMPLATE = "newaccount";
     public static final String PASSWORD_RESET_TEMPLATE = "resetpassword";
     public static final String PASSWORD_RESET_REQUEST = "Password Reset Request";
+    public static final String REPORT_EMAIL_TEMPLATE = "reportemail"; // report template
 
     // Dependency injection of JavaMailSender for sending emails, and TemplateEngine for processing email templates.
     private final JavaMailSender emailSender;
@@ -85,6 +87,34 @@ public class EmailServiceImpl implements EmailService {
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
             throw new ApiException("Unable to send email");
+        }
+    }
+    @Override
+    @Async
+    public void sendReportEmailWithAttachment(String recipientEmail, String subject, String userName, byte[] pdfAttachment, String attachmentFilename) {
+        try {
+            var context = new Context();
+            context.setVariables(Map.of("name", userName, "reportName", attachmentFilename));
+            var text = templateEngine.process(REPORT_EMAIL_TEMPLATE, context);
+            MimeMessage message = getMimeMessage();
+            // true = multipart message
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);
+
+            helper.setPriority(1);
+            helper.setSubject(subject);
+            helper.setFrom(fromEmail);
+            helper.setTo(recipientEmail);
+            helper.setText(text, true); // true = HTML
+
+            // Add attachment
+            helper.addAttachment(attachmentFilename, new ByteArrayResource(pdfAttachment));
+
+            emailSender.send(message);
+            log.info("Report email sent successfully to {} with attachment {}", recipientEmail, attachmentFilename);
+
+        } catch (Exception exception) {
+            log.error("Error sending report email to {}: {}", recipientEmail, exception.getMessage(), exception);
+            throw new ApiException("Unable to send report email with attachment");
         }
     }
 
