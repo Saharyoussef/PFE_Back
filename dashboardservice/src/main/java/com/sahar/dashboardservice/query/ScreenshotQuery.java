@@ -3,7 +3,13 @@ package com.sahar.dashboardservice.query;
 public class ScreenshotQuery {
     public static final String CREATE_SCREENSHOT_FUNCTION =
             """
-            SELECT * FROM create_screenshot(:screenshotUuid, :grafanadashboardId, :url)
+            SELECT
+                f.o_screenshot_id        AS screenshot_id,
+                f.o_screenshot_uuid      AS screenshot_uuid,
+                f.o_grafanadashboard_id  AS grafanadashboard_id,
+                f.o_url                  AS url,
+                f.o_created_at           AS created_at
+            FROM create_screenshot(:screenshotUuid, :grafanadashboardId, :url) f
             """;
     public static final String DELETE_SCREENSHOT_QUERY =
             """

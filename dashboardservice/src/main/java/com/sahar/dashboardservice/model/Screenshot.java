@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @ToString
@@ -16,8 +18,8 @@ import lombok.ToString;
 public class Screenshot {
     private Long screenshotId;
     private String screenshotUuid;
-    private Long grafanaDashboardId;
+    private Long grafanadashboardId;
     private String url;
-    private String createdAt;
+    private LocalDateTime createdAt;
     private String grafanaDashboardName; // To hold the joined dashboard name
 }
