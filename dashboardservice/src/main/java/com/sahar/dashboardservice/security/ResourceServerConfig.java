@@ -36,7 +36,7 @@ public class ResourceServerConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests( authorize -> authorize
                         .requestMatchers("/user/register/**", "/user/verify/account/**", "/user/verify/password/**", "/user/resetpassword/**", "/user/image/**","/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -52,7 +52,7 @@ public class ResourceServerConfig {
         return http.build();
     }
 
-    @Bean
+    //@Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
