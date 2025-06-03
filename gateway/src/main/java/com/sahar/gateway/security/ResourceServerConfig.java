@@ -39,7 +39,7 @@ public class ResourceServerConfig {
                 // Configure authorization rules
                 .authorizeHttpRequests( authorize -> authorize
                         // Public endpoints that don't require authentication
-                        .requestMatchers("/user/register/**", "/user/verify/account/**", "/user/verify/password/**", "/user/resetpassword/**", "/user/image/**", "/authorization/**", "/.well-known/**").permitAll()
+                        .requestMatchers("/user/register/**", "/user/verify/account/**", "/user/verify/password/**", "/user/resetpassword/**", "/user/image/**", "/authorization/**", "/.well-known/**","/dashboard/screenshots_data/**").permitAll()
                         // Any other endpoint requires authentication
                         .anyRequest().authenticated())
 

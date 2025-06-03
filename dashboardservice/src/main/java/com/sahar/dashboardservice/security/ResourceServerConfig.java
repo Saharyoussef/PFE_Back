@@ -42,7 +42,8 @@ public class ResourceServerConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/api-docs/**",
-                                "/swagger-resources/**").permitAll()
+                                "/swagger-resources/**",
+                                "/dashboard/screenshots_data/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .accessDeniedHandler(new CustomAccessDeniedHandler())
