@@ -70,4 +70,11 @@ public class GrafanaDashboardResource {
         var pages = grafanaDashboardService.getPages(authentication.getName(), page, size, filter);
         return ok(getResponse(request, of("dashboards", dashboards, "pages", pages), "Dashboards retrieved", OK));
     }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN') OR hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
+    public ResponseEntity<Response> getAllDashboards(@NotNull Authentication authentication, HttpServletRequest request, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "100") int size,@RequestParam(value = "filter", defaultValue = "") String filter) {
+        var dashboards = grafanaDashboardService.getGrafanaDashboards(authentication.getName(), page, size, filter);
+        return ok(getResponse(request, of("dashboards", dashboards), "Dashboards retrieved", OK));
+    }
 }
