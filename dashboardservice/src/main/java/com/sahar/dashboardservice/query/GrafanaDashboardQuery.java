@@ -10,10 +10,17 @@ public class GrafanaDashboardQuery {
             DELETE FROM grafanadashboard WHERE grafanadashboard_uuid = :grafanadashboardUuid
             """;
 
-    public static final String UPDATE_DASHBOARD_FUNCTION =
-            """
-            SELECT * FROM update_grafanadashboard(:grafanadashboardUuid, :name, :description, :url)
-            """;
+    public static final String UPDATE_DASHBOARD_FUNCTION = """
+    SELECT
+        o_grafanadashboard_id AS grafanadashboardId,
+        o_grafanadashboard_uuid AS grafanadashboardUuid,
+        o_name AS name,
+        o_description AS description,
+        o_url AS url,
+        o_created_at AS createdAt,
+        o_updated_at AS updatedAt
+    FROM update_grafanadashboard(:grafanadashboardUuid, :name, :description, :url)
+""";
 
     public static final String SELECT_GRAFANA_DASHBOARDS_QUERY =
             """
