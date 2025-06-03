@@ -102,4 +102,20 @@ public class ScreenshotResource {
         var pages = screenshotService.getPages(userUuid, page, size, filterByDashboardName, filterByDate); // page here is for context if needed by getResponse, not for calculation
         return ok(getResponse(request, of("screenshots", screenshots, "pages", pages), "Screenshots retrieved", OK));
     }
+
+    @GetMapping("/screenshots/all")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN') OR hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
+    public ResponseEntity<Response> getAllScreenshots(
+            @NotNull Authentication authentication,
+            HttpServletRequest request,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "12") int size,
+            @RequestParam(value = "dashboardName", required = false) String filterByDashboardName, // New specific filter
+            @RequestParam(value = "date", required = false) String filterByDate // New specific filter (e.g., "YYYY-MM-DD")
+    ) {
+
+        String userUuid = authentication.getName();
+        var screenshots = screenshotService.getScreenshots(userUuid, page, size, filterByDashboardName, filterByDate);
+        return ok(getResponse(request, of("screenshots", screenshots), "Screenshots retrieved", OK));
+    }
 }
