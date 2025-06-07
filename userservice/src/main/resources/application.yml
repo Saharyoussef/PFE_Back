@@ -39,6 +39,12 @@ spring:
             type:
               mapping: Notification:com.sahar.userservice.domain.Notification
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+
 
 eureka:
   instance:
