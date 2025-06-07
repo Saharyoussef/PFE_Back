@@ -15,7 +15,8 @@ public class UserQuery {
                                SELECT r.name AS role, r.authority AS authorities, u.qr_code_image_uri, u.member_id, u.account_non_expired, u.account_non_locked, u.created_at, u.email, u.username, u.enabled, u.first_name, u.user_id, u.image_url, u.last_login, u.last_name, u.mfa, u.updated_at, u.user_uuid, u.bio, u.phone, u.address FROM users u JOIN user_roles ur ON ur.user_id = u.user_id JOIN roles r ON r.role_id = ur.role_id WHERE u.email = :email
                                """;
     public static final String UPDATE_USER_FUNCTION =
-                               """                               
+                               """   
+                               SELECT * FROM update_user_profile(:userUuid, :firstName, :lastName, :email, :phone,:bio, :address)                            
                                """;
     public static final String CREATE_USER_STORED_PROCEDURE =
                                """
