@@ -177,4 +177,47 @@ public class UserResource {
         return URI.create("/user/profile/userId");
     }
 
+    // ------------------------ USERs MANAGEMENT ------------------------
+    @PatchMapping("/admin/{userUuid}/update")
+    public ResponseEntity<Response> updateUserByAdmin(
+            @PathVariable("userUuid") String userUuid,
+            @RequestBody UserRequest user,
+            HttpServletRequest request) {
+        var updatedUser = userService.updateUser(userUuid, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getBio(), user.getAddress());
+        return ok(getResponse(request, of("user", updatedUser), "User updated successfully by admin", OK));
+    }
+
+    @PatchMapping("/admin/{userUuid}/updaterole")
+    public ResponseEntity<Response> updateRoleByAdmin(
+            @PathVariable("userUuid") String userUuid,
+            @RequestBody RoleRequest roleRequest,
+            HttpServletRequest request) {
+        var updatedUser = userService.updateRole(userUuid, roleRequest.getRole());
+        return ok(getResponse(request, of("user", updatedUser), "User role updated successfully by admin", OK));
+    }
+
+    @PatchMapping("/admin/{userUuid}/toggleaccountexpired")
+    public ResponseEntity<Response> toggleAccountExpiredByAdmin(
+            @PathVariable("userUuid") String userUuid,
+            HttpServletRequest request) {
+        var user = userService.toggleAccountExpired(userUuid);
+        return ok(getResponse(request, of("user", user), "User account expired toggled successfully by admin", OK));
+    }
+
+    @PatchMapping("/admin/{userUuid}/toggleaccountlocked")
+    public ResponseEntity<Response> toggleAccountLockedByAdmin(
+            @PathVariable("userUuid") String userUuid,
+            HttpServletRequest request) {
+        var user = userService.toggleAccountLocked(userUuid);
+        return ok(getResponse(request, of("user", user), "User account locked toggled successfully by admin", OK));
+    }
+
+    @PatchMapping("/admin/{userUuid}/toggleaccountenabled")
+    public ResponseEntity<Response> toggleAccountEnabledByAdmin(
+            @PathVariable("userUuid") String userUuid,
+            HttpServletRequest request) {
+        var user = userService.toggleAccountEnabled(userUuid);
+        return ok(getResponse(request, of("user", user), "User account enabled toggled successfully by admin", OK));
+    }
+
 }
