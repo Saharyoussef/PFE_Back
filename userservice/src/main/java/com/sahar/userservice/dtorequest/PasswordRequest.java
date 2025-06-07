@@ -19,5 +19,5 @@ public class PasswordRequest {
     @NotEmpty(message = "New password cannot be empty or null")
     private String newPassword;
     @NotEmpty(message = "Confirm password cannot be empty or null")
-    private String confirmPassword;
+    private String confirmNewPassword;
 }

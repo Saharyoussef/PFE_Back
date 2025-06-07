@@ -129,7 +129,7 @@ public class UserResource {
     //When user IS logged in
     @PatchMapping("/updatepassword")
     public ResponseEntity<Response> updatePassword(@NotNull Authentication authentication, @RequestBody PasswordRequest passwordRequest, HttpServletRequest request) {
-        userService.updatePassword(authentication.getName(), passwordRequest.getCurrentPassword(), passwordRequest.getNewPassword(), passwordRequest.getConfirmPassword());
+        userService.updatePassword(authentication.getName(), passwordRequest.getCurrentPassword(), passwordRequest.getNewPassword(), passwordRequest.getConfirmNewPassword());
         return ok(getResponse(request, emptyMap(), "Password updated successfully", OK));
     }
 
@@ -163,7 +163,7 @@ public class UserResource {
     @PatchMapping("/photo")
     public ResponseEntity<Response> uploadPhoto(@NotNull Authentication authentication, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
         var user = userService.uploadPhoto(authentication.getName(), file);
-        return ok(getResponse(request, of("users", user), "Photo updated successfully", OK));
+        return ok(getResponse(request, of("user", user), "Photo updated successfully", OK));
     }
 
     @GetMapping("/image/{filename}")
