@@ -22,6 +22,8 @@ public class User {
     private String password;
     private String phone;
     private String bio;
+    private String address;
+    private String memberId;
     private String imageUrl;
     private String qrCodeImageUri;
     private String qrCodeSecret;
