@@ -109,7 +109,7 @@ public class ScreenshotResource {
             @NotNull Authentication authentication,
             HttpServletRequest request,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "12") int size,
+            @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "dashboardName", required = false) String filterByDashboardName, // New specific filter
             @RequestParam(value = "date", required = false) String filterByDate // New specific filter (e.g., "YYYY-MM-DD")
     ) {
