@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
@@ -100,14 +102,14 @@ public class UserServiceImpl implements UserService {
         return userRepository.disableMfa(userUuid);
     }
 
-    @Override
+   /* @Override
     public User uploadPhoto(String userUuid, MultipartFile file) {
         var user = userRepository.getUserByUuid(userUuid);
         var imageUrl = photoFunction.apply(user.getImageUrl(), file);
         userRepository.updateImageUrl(userUuid, imageUrl);
         user.setImageUrl(imageUrl + "?timestamp=" + System.currentTimeMillis());
         return user;
-    }
+    }*/
 
     @Override
     public User toggleAccountExpired(String userUuid) {
@@ -209,4 +211,51 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("Unable to save image");
         }
     };
+
+    @Override
+    @Transactional // Important pour garantir que les opérations de fichier et de BD réussissent ou échouent ensemble
+    public User uploadPhoto(String userUuid, MultipartFile file) {
+        log.info("Uploading photo for user with UUID: {}", userUuid);
+        var user = userRepository.getUserByUuid(userUuid);
+
+        // 1. Définir un nom de fichier unique basé sur le UUID de l'utilisateur
+        String filename = userUuid + fileExtension.apply(file.getOriginalFilename());
+
+        try {
+            // 2. Définir le chemin de stockage
+            var fileStorageLocation = Paths.get(PHOTO_DIRECTORY).toAbsolutePath().normalize();
+            if (!Files.exists(fileStorageLocation)) {
+                Files.createDirectories(fileStorageLocation);
+            }
+
+            // 3. (Optionnel mais recommandé) Supprimer l'ancienne photo si elle existe et n'est pas l'image par défaut
+            if(user.getImageUrl() != null && !user.getImageUrl().contains("default")) { // Adaptez "default" au nom de votre image par défaut
+                Path oldFilePath = Paths.get(PHOTO_DIRECTORY).resolve(
+                        user.getImageUrl().substring(user.getImageUrl().lastIndexOf("/") + 1)
+                );
+                Files.deleteIfExists(oldFilePath);
+                log.info("Deleted old profile photo: {}", oldFilePath.toString());
+            }
+
+            // 4. Sauvegarder la nouvelle photo
+            Files.copy(file.getInputStream(), fileStorageLocation.resolve(filename), REPLACE_EXISTING);
+            log.info("Saved new profile photo: {}", filename);
+
+            // 5. Créer la nouvelle URL
+            var imageUrl = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/user/image/" + filename).toUriString();
+
+            // 6. Mettre à jour l'URL dans la base de données
+            userRepository.updateImageUrl(userUuid, imageUrl);
+
+            // 7. Mettre à jour l'objet utilisateur pour le retour (le timestamp est une excellente idée pour éviter les problèmes de cache du navigateur)
+            user.setImageUrl(imageUrl + "?timestamp=" + System.currentTimeMillis());
+            return user;
+
+        } catch (Exception exception) {
+            log.error("Error while uploading photo: {}", exception.getMessage());
+            throw new ApiException("Unable to save image. Please try again.");
+        }
+    }
 }
