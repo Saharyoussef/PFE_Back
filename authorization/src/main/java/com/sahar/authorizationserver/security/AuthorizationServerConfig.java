@@ -81,7 +81,7 @@ public class AuthorizationServerConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()));
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/login", "/oauth2/authorize/**", "oauth2/authorize").permitAll()
+                .requestMatchers("/login", "/photos/**", "/oauth2/authorize/**", "oauth2/authorize").permitAll()
                 .requestMatchers(POST, "/logout").permitAll()
                 .requestMatchers("/mfa").hasAuthority("MFA_REQUIRED")
                 .anyRequest().authenticated());
